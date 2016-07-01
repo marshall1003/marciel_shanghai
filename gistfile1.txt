@@ -1,0 +1,200 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#define MAX 3
+#include <vector>
+using namespace std;
+
+//falta apenas a conversao de GPS para PGC (ver com o Eduardo)
+//ordenar em ordem crescente de ID
+
+
+class veiculo {
+	
+	public:
+	int id, total_elementos;
+	std::vector<string> x;
+	std::vector<string> y;
+	std::vector<string> tempo;
+	static int total_IDs;
+	
+	//funcoes
+	veiculo(int ID);
+	~veiculo();
+	int acharID(int atual_id);
+	void troca(veiculo automovel); //ordenar os veiculos
+		
+
+};
+
+string acharx(string linha);
+string achary(string linha);
+string achartempo(string linha);
+
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+
+int main() {
+
+	int total_linhas = 0, tamanho_string, temp_id;
+	std::vector<veiculo> carro; //criado dinamicamente 
+	int i = 0; // contador de laco
+	string line; //variavel criada apenas para que se contabilize o numero de linhas do arquivo
+	string *dado; //alocacao dinamica para cada linha do arquivo
+	
+	
+	 fstream trace ("C:/Users/doacao/Documents/estagio/teste.txt");
+	
+	
+	if(trace.is_open()){
+		
+		
+		while(getline(trace, line)){
+		
+	
+			total_linhas++;
+			
+		}
+		
+			
+	}	//cantabilizacao do numero de linhas do arquivo para criacao dinamica do vetor
+	
+	
+	dado = new string[total_linhas];
+	
+	for(i = 0; i < total_linhas; i++){
+		
+		getline(trace, dado[i]);
+	}//geracao de cada linha do arquivo independente uma da outra
+	
+	trace.close();
+	
+	i = 0;
+	
+	//separacao por id de veiculo
+	
+	do{
+		tamanho_string = dado[i].length();
+		temp_id = dado[i].find(10, 6);
+		
+		if(jaexiste(temp_id)){
+			
+			
+			carro[acharID(temp_id)].tempo.push_back(achartempo(dado[i]));
+			carro[acharID(temp_id)].x.push_back(acharx(dado[i]));
+			carro[acharID(temp_id)].y.push_back(achary(dado[i]));
+		}
+		else{
+			
+			carro.push_back(temp_id);
+			carro[total_IDs].tempo.push_back(achartempo(dado[i]));
+			carro[total_IDs].x.push_back(acharx(dado[i]));
+			carro[total_IDs].y.push_back(achary(dado[i]));
+			
+		}
+		
+		i++;
+		
+	}	
+	while(i < total_linhas);
+		
+		//ordenacao dos IDs
+		
+		for(i = 0; i < total_IDs - 1; i++){
+			
+			for(int k = 0; k < total_IDs; k++){
+				
+				if(carro[i].id > carro[k].id){
+					
+					troca(carro[k]);
+				}
+			}
+		}
+		
+		
+		
+		
+	return 0;
+}
+
+veiculo::veiculo (int ID){
+	
+	
+	id = ID;
+	total_elementos = 1;
+	total_IDs++;
+}
+
+string achary(string linha){ //achar a coordenada y em gps
+	
+	int segundo, terceiro;
+	
+	segundo = linha.find(',', linha.find(',', 0));
+	terceiro = linha.find(',', linha.find(',', linha.find(',', 0)));
+	return linha.assign(segundo ,terceiro); //achando a 2a e a 3a virgulas e contando quantos elementos tem entre eles
+	
+}
+
+string acharx(string linha){ //achar a coordenada x em GPS
+	
+	int quarto, terceiro;
+	
+	terceiro = linha.find(',', linha.find(',', linha.find(',', 0)));
+	quarto = linha.find(',', linha.find(',', linha.find(',', linha.find(',', 0))));
+	return linha.assign(terceiro, quarto); //achando a 2a e a 3a virgulas e contando quantos elementos tem entre eles}
+}
+
+string achartempo(string linha){ //achar o tempo em H/MIN/SEG
+	
+	int setimo;
+	
+	setimo = linha.find(',', linha.find(',', linha.find(',', linha.find(',', linha.find(',', linha.find(',', linha.find(',', 0)))))));
+	return linha.assign(setimo - 8 ,setimo); //achando a 2a e a 3a virgulas e contando quantos elementos tem entre eles}
+}
+
+int veiculo::acharID(int atual_id){//achar aonde esta aquele ID
+	
+	for(int i = 0; i < total_IDs; i++){
+		
+		if(carro[i].id == atual_id)
+		return 1;
+		
+	}
+	
+}
+
+veiculo::~veiculo(){
+	
+	delete veiculo;
+}
+
+void veiculo::troca(veiculo automovel){
+	
+	veiculo temporario;
+	
+	//troca id
+	temporario.id = this->id;
+	this.id = automovel->id;
+	automovel.id = temporario->id;
+	
+	//troca x
+	temporario.x = this->x;
+	this.x = automovel->x;
+	automovel.x = temporario->x;
+	
+	//troca y
+	
+	temporario.y = this->y;
+	this.y = automovel->y;
+	automovel.y = temporario->y;
+	
+	// troca tempo
+	
+	temporario.tempo = this->tempo;
+	this.tempo = automovel->tempo;
+	automovel.tempo = temporario->tempo;
+	
+	// troca total de elementos
+	temporario.total_elementos = this->total_elementos;
+	this.total_elementos = automovel->total_elementos;
+	automovel.total_elementos = temporario->total_elementos;
+}
